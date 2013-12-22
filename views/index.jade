@@ -1,0 +1,86 @@
+extend layout
+block content
+  #articles
+    - each article in articles
+       div.post
+        div.title 
+         form(method="post",action="/delete")
+          a(href="/blog/"+article._id.toHexString() +"/1")!= article.title 
+          input(type="hidden", name="id", value=article._id.toHexString())
+          if(currentSession.isAdmin || currentSession.user_id == article.user)
+           input(type="submit", name="button", value="Delete")
+        div.postedAt 
+            Posted  #{article.created_at} - #{article.nbComments} Comments - #{article.nbfiles} Files - #{currentSession.user_id} 
+        div.body!= article.body 
+
+block pages
+  script(type='text/javascript')
+   var nbPages = Math.ceil(#{nbPosts}/#{nbPagesPosts});
+   document.write("<ul id='pagination-flickr'>");
+   
+   if(#{pageId} != 1) {
+      var previousPage = #{pageId} - 1;    
+      document.write("<li class='previous'><a href=/" + previousPage + ">«Previous</a></li>");
+    }
+    else {
+      document.write("<li class='previous-off'>«Previous</li>");
+    }
+
+    if((nbPages - #{pageId}) > 10)
+    {
+     for(var i=#{pageId};i<=#{pageId}+5;i++)
+     {
+      if(i != #{pageId}) {
+          document.write("<li><a href='/" + i + "'>" + i + "</a></li>");
+      }
+      else {
+            document.write("<li class='active'>" + i +"</li>");
+      }
+     }
+     document.write("<li><a href='/" + #{pageId} + "'>...</a></li>");
+
+     for(var i=nbPages-5;i<=nbPages;i++)
+     {
+      if(i != #{pageId}) {
+          document.write("<li><a href='/" + i + "'>" + i + "</a></li>");
+      }
+      else {
+            document.write("<li class='active'>" + i +"</li>");
+      }
+     }
+    }
+    else {
+    for(var i=#{pageId};i<=nbPages;i++)
+     {
+      if(i != #{pageId}) {
+          document.write("<li><a href='/" + i + "'>" + i + "</a></li>");
+      }
+      else {
+            document.write("<li class='active'>" + i +"</li>");
+      }
+     }
+    }
+    
+    if(#{pageId} != nbPages && #{nbPagesPosts} > 1)
+    {
+      var nextPage = #{pageId} + 1;    
+      document.write("<li class='next'><a href=/" + nextPage + ">Next »</a></li>");
+    }
+    else {
+      document.write("<li class='next-off'>Next »</li>");
+    }
+   document.write("</ul>"); 
+
+block addPost
+   a(href="/blog/new")!= "Add New Post"
+   br
+   a(href="/blog/manageUser")!= "Manage Users"
+   br
+   a(href="/blog/ViewLog")!= "View Log"
+   br
+   a(href="/blog/login")!= "Logout"
+
+block footer
+ div
+  hr
+  p Running on node with Express, Jade, Stylus and MongoDB

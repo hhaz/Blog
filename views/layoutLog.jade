@@ -1,0 +1,16 @@
+!!!5
+html
+  head
+    title HAZ NodeJS Test Site
+    script(type='text/javascript')
+      document.write("<link rel='stylesheet' href='/stylesheets/styleLog.css'/>");
+      document.write("<link rel='stylesheet' href='/stylesheets/widget.css'/>");
+      document.write("<link rel='stylesheet' href='/stylesheets/user.css'/>");
+  body
+    header
+      h1 #{title}
+    .container
+      block content
+    footer
+      block home
+      p Running on node with Express, Jade and Stylus

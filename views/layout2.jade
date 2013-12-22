@@ -1,0 +1,25 @@
+!!!5
+html
+  head
+    title HAZ NodeJS Test Site
+    link(rel='stylesheet', href='/stylesheets/style2.css')
+  body
+    header
+      h1 #{title}
+    .container1
+      .contentTitle
+        block titleContent
+      .contentBody
+        block contentBody
+    .container2  
+     .comments
+        block comments
+        hr
+        block pages
+     .files
+         block files  
+     .newcomment  
+        block new          
+    footer
+      block home
+      p Running on node with Express, Jade and Stylus

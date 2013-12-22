@@ -1,0 +1,18 @@
+!!!5
+html
+  head
+    title HAZ NodeJS Test Site
+    script(type='text/javascript')
+      document.write("<link rel='stylesheet' href='/stylesheets/style2.css'/>");
+  body
+    header
+      h1 #{title}
+      h2 #{nbPosts} Posts
+    .leftContainer
+      block addPost
+    .container
+      block content
+      .pages  
+        block pages 
+    footer
+      block footer

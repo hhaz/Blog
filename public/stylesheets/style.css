@@ -1,0 +1,136 @@
+/*
+ * Import nib
+ */
+/*
+ * Grab a custom font from Google
+ */
+@import url("http://fonts.googleapis.com/css?family=Quicksand");
+/*
+ * Nib provides a CSS reset
+ */
+/*
+ * Store the main color and
+ * background color as variables
+ */
+ul {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+#pagination-flickr li {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  list-style: none;
+}
+#pagination-flickr a {
+  border: solid 1px #ddd;
+  margin-right: 2px;
+}
+#pagination-flickr .previous-off,
+#pagination-flickr .next-off {
+  color: #666;
+  display: block;
+  float: left;
+  font-weight: bold;
+  padding: 3px 4px;
+}
+#pagination-flickr .next a,
+#pagination-flickr .previous a {
+  font-weight: bold;
+  border: solid 1px #fff;
+}
+#pagination-flickr .active {
+  color: #ff0084;
+  font-weight: bold;
+  display: block;
+  float: left;
+  padding: 4px 6px;
+}
+#pagination-flickr a:link,
+#pagination-flickr a:visited {
+  color: #0063e3;
+  display: block;
+  float: left;
+  padding: 3px 6px;
+  text-decoration: none;
+}
+#pagination-flickr a:hover {
+  border: solid 1px #666;
+}
+body {
+  font-family: 'Georgia';
+  background-color: #faf9f0;
+  color: #444;
+}
+header {
+  font-family: 'Quicksand';
+  padding: 5px 5px;
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
+/*
+   * Note the use of the `main-color`
+   * variable and the `darken` function
+   */
+  background-color: #fa5b4d;
+  border-bottom: 1px solid #df1806;
+  text-shadow: 0px -1px 0px #df1806;
+}
+.container {
+  width: 1000px;
+  margin: 10px auto;
+  overflow: hidden;
+}
+.pages {
+  width: 1000px;
+  margin: 10px auto;
+  overflow: hidden;
+}
+.main-content {
+  float: left;
+  width: 800px;
+}
+.main-content p {
+  margin-bottom: 20px;
+}
+.sidebar {
+  float: left;
+  width: 200px;
+}
+.sidebar .widget {
+/*
+     * Note the lack of vendor
+     * prefixes here. Nib will
+     * add them for us
+     */
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  margin-left: 20px;
+  background-color: #faf9f0;
+  box-shadow: inset 0px 0px 0px 3px rgba(255,255,255,0.8), 0px 3px 0px -2px rgba(0,0,0,0.1);
+}
+.sidebar .widget h1 {
+  font-family: 'Quicksand';
+  margin: 13px 10px 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px dotted #ddd;
+  border-radius: 2px 2px 0px 0px;
+  margin-bottom: 10px;
+}
+.sidebar .widget p {
+  font-size: 13px;
+  padding: 0px 10px;
+  margin-bottom: 10px;
+}
+p {
+  line-height: 1.8;
+}
+footer {
+  width: 500px;
+  margin: 50px auto;
+  border-top: 1px dotted #ccc;
+  padding-top: 5px;
+  font-size: 13px;
+}

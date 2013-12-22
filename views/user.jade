@@ -1,0 +1,96 @@
+extend layoutUser
+block content
+ script
+  function openPopup(page) {
+       window.open(page,"nom_popup","menubar=no, status=no, scrollbars=no, menubar=no, width=200, height=100");
+  }
+  function overlay(username,email){
+    el = document.getElementById("overlay");
+    document.getElementById("usernamedisabled").value = username;
+    document.getElementById("username2").value = username;
+    document.getElementById("email2").value = email;
+    el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+  }
+  function closeOverlay() {
+     document.getElementById("overlay").style.visibility = 'hidden';
+  }
+ div(id="overlay")
+  div
+   p Modify User
+   form(method="post",action="/blog/modifyUser")
+    table(id="tableLogin")
+     td User Name
+     td 
+       input(type="text", name="usernamedisabled", id="usernamedisabled",disabled)
+       input(type="hidden", name="username2", id="username2")
+     tr
+     td Password
+     td 
+       input(type="password", name="password2", id="password2")
+     tr
+     td email
+     td 
+       input(type="text", name="email2", id="email2")
+     tr
+     if(admin) 
+      td Admin
+      td 
+        input(type="checkbox",name="admin2",id="admin2")
+    table
+     tr
+     tr
+     td
+      button(type="submit",id="okbutton") OK
+     if(admin) 
+      td
+        button(type="submit",formaction="/blog/deleteUser") Delete
+     td
+      button(type="button",onclick="closeOverlay()") Cancel
+
+
+ table(id="tableLogin")
+  td
+   h3= title
+   table(id="tableComments")
+    th User Name
+    th eMail
+    th Action
+    - for user in users
+      tr(style="vertical-align: top;")
+      td #{user.userName}
+      td #{user.email}
+      td
+        input(type="submit",name="update",id="update", value="Modify", onclick="overlay('#{user.userName}','#{user.email}')")
+      tr
+ if(admin)     
+   h3 Add User
+   form(method="post",action="/blog/addUser")
+    table(id="tableLogin")
+     td User Name
+     td 
+      div 
+       input(type="text", name="username", id="username")
+     tr
+     td Password
+     td 
+      div
+       input(type="password", name="password", id="password")
+     tr
+     td email
+     td 
+      div
+       input(type="text", name="email", id="email")
+     tr  
+     td Admin
+     td 
+      div(class="onoffswitch")
+       input(type="checkbox",name="admin",class="onoffswitch-checkbox",id="myonoffswitch")
+       label(class="onoffswitch-label",for="myonoffswitch")
+         div(class="onoffswitch-inner")
+         div(class="onoffswitch-switch")
+    table(id="tableLogin")
+    td
+       input(type="submit", value="OK")
+
+block home
+  a(href="/")!= "Home"

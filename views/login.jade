@@ -1,0 +1,32 @@
+extend layoutLogin
+block scroll
+ div(id="containerBanner")
+  div(class="photobanner")
+   img(class="first",alt="",src="/images/img1.jpg",width="450",height="253")
+   img(alt="",src="/images/img2.jpg",width="450",height="253")
+   img(alt="",src="/images/img3.jpg",width="450",height="253")
+   img(alt="",src="/images/img4.jpg",width="450",height="253")
+   img(alt="",src="/images/img5.jpg",width="450",height="253")
+   img(alt="",src="/images/img6.jpg",width="450",height="253")
+   img(alt="",src="/images/img1.jpg",width="450",height="253")
+   img(alt="",src="/images/img2.jpg",width="450",height="253")
+   img(alt="",src="/images/img3.jpg",width="450",height="253")
+block content
+ div(id="slides")
+  div(class="slide")
+   img(alt="mon image",src="/images/login.jpg")
+   table(id="tableLogin")
+    td
+     h3= title
+   form(method="post")
+    table(id="tableLogin")
+     td User Name
+     td 
+      div 
+       input(type="text", name="username", id="username")
+     tr
+     td Password
+     td 
+      div
+       input(type="password", name="password", id="password")
+       input(type="submit", value="OK")

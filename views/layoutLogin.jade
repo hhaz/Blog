@@ -1,0 +1,17 @@
+!!!5
+html
+  head
+    title HAZ NodeJS Test Site
+    script(type='text/javascript')
+      document.write("<link rel='stylesheet' href='/stylesheets/styleLogin.css'/>");
+      document.write("<link rel='stylesheet' href='/stylesheets/widget.css'/>");
+      document.write("<link rel='stylesheet' href='/stylesheets/photobanner.css'/>");
+  body
+    header
+      h1 #{title}
+    .scroll
+        block scroll
+    .container
+        block content 
+    footer
+      p Running on node with Express, Jade, Stylus and MongoDB

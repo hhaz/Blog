@@ -1,0 +1,18 @@
+extend layoutLog
+block content
+ table(id="tableLogin")
+  td
+   h3= "Connection Log"
+   table(id="tableComments")
+    th User Name
+    th IP Address
+    th Date
+    - for log in logs
+      tr(style="vertical-align: top;")
+      td #{log.username}
+      td #{log.ip}
+      td #{log.dateCreated}
+      tr
+
+block home
+  a(href="/")!= "Home"

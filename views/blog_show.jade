@@ -1,0 +1,134 @@
+extend layout2
+block titleContent
+ h1=title
+  div.created_at= '&nbsp;&nbsp;&nbsp;Posted ' + article.created_at
+block contentBody 
+  div.body!= article.body
+  
+block comments
+ h2 Comments
+ table(id="tableComments")
+  th Author
+  th Comment
+  th Action
+  tr(style="vertical-align: top;")
+  script
+    var index = 0;
+    var nbPages = 0;
+    var currentPage = 1;
+    if(#{page}) {
+      currentPage = #{page};
+     }
+    nbPages = Math.ceil(#{comments.length}/#{nbPagesComments});
+  - for comment in comments
+      form(method="post",action="/deleteComment")
+       script
+        if((index >= #{nbPagesComments}*(currentPage - 1)) && (index < #{nbPagesComments}*currentPage)) {
+         document.write("<td>#{comment.person}</td>");
+         document.write("<td class='alt'>!{comment.comment}</td>");
+         if('#{comment.person}' == '#{currentUser}' || '#{currentSession.isAdmin}') {
+           document.write("<input type='hidden' name='postid' value='" + '#{article._id}' + "'/>");
+           document.write("<input type='hidden' name='userid' value='" + '#{comment.person}' + "'/>");
+           document.write("<input type='hidden' name='comment' value='" + "#{comment.comment}" + "'/>");
+           document.write("<td><input type='submit' name='button' value='Delete'/></td>");
+         }
+         else {
+           document.write("<td><input type='submit' name='button' value='Delete' disabled/></td>");
+           document.write("<tr/>");
+          }
+         document.write("<tr/>");
+        }
+        index += 1;
+br
+ 
+block pages
+  center
+   script
+    document.write("<ul id='pagination-flickr'>");
+    if(currentPage != 1) {
+      var previousPage = currentPage - 1;    
+      document.write("<li class='previous'><a href=/blog/" + '#{article._id}'+ "/" + previousPage + ">«Previous</a></li>");
+    }
+    else {
+      document.write("<li class='previous-off'>«Previous</li>");
+    }
+    for(j=1;j<=nbPages;j++) {
+      if( j != currentPage) {
+        document.write("<li><a href='/blog/" + '#{article._id}' + "/" + j.toString() + "'>" + j + "</a></li>");
+      }
+      else {
+        document.write("<li class='active'>" + j +"</li>");
+      }
+    }
+    if(currentPage != nbPages && nbPages > 1)
+    {
+      var nextPage = currentPage + 1;    
+      document.write("<li class='next'><a href=/blog/" + '#{article._id}'+ "/" + nextPage + ">Next »</a></li>");
+    }
+    else {
+      document.write("<li class='next-off'>Next »</li>");
+    }
+    document.write("</ul>");
+
+block new
+ h2 New Comment
+ p
+  div
+  form(id="sendForm", method="post", action="/blog/addComment")
+   input( type="hidden", name="_id", value=article._id.toHexString())
+   table(id="tableNewComment")
+    td
+      div
+        span Author  
+    td
+      div!=currentUser
+    tr    
+    td
+      div
+        span Comment
+    td
+      div
+       textarea( name="comment", rows=5, id="addCommentComment")
+   div#editArticleSubmit
+   hr
+   input(type="submit", value="Send")
+
+block files
+ form(id="fileList", method="post", action="/deleteFile", enctype="multipart/form-data")
+  h2 Files
+  table(id="tableFiles", align="center")
+   th User
+   th File Name
+   th Size
+   th Sel
+   tr(style="vertical-align: top;")
+    - for file in files
+     - if (file)
+        script
+         document.write("<td>#{file.userid}</td>");
+         document.write("<td><a href=/download/" + '#{file.id}' + "/" + escape("#{file.name}") + ">" + "#{file.name}" +"</a></td>");
+         document.write("<td>#{file.size}</td>");
+         document.write("<td><input type='checkbox' name='checkid' value='" + '#{file.id}' + ',' + '#{file.name}' + "'/></td>");
+         document.write("<tr/>");
+  hr
+
+  input(type="hidden", name="_title", value=title);
+  input(type="hidden", name="_id", value=article._id.toHexString());
+  input(type='submit', name="delete", value="Delete Selected Files");
+  input(type='submit', name="download", value="Download Selected Files",formaction="/download");
+  script
+    document.write("<input type='checkbox' onClick='toggle(this)' />Select All<br/>");
+    function toggle(source) {
+      checkboxes = document.getElementsByName('checkid');
+      for(var i=0, n=checkboxes.length;i<n;i++)
+        checkboxes[i].checked = source.checked;
+    }
+ hr    
+ form(id="uploadFile", method="post", action="/upload", enctype="multipart/form-data")
+  input(type="hidden", name="_id", value=article._id.toHexString())
+  input(type="file", multiple, name="fileNames")
+  input(type='submit',value="Upload")
+ br 
+
+block home
+  a(href="/")!= "Home"

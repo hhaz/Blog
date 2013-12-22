@@ -1,0 +1,17 @@
+extend layoutNewBlog
+block content
+ table(id="tableLogin")
+  td
+   h3= title
+ form(method="post")
+  table(id="tableLogin")
+   td Title
+   td 
+    div 
+     input(type="text", name="title", id="editArticleTitle")
+   tr
+   td Body
+   td 
+    div
+     textarea( name="body", rows=20, id="editArticleBody)
+     input(type="submit", value="OK")
