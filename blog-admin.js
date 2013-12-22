@@ -12,7 +12,7 @@ BlogAdmin = function(host, port) {
   this.db= new Db('node-mongo-blog', new Server(host, port, {auto_reconnect: true}), {w:1,journal:true,fsync:false});
   this.db.open(function(err,client){
 	if(err)
-	  console.log("DB connection : " + err);
+	  console.log("DB connection error : " + err);
   });
 };
 
