@@ -77,10 +77,10 @@ passport.use(new LocalStrategy(
 				if( signature == user.password)
 					return done(null, user);
 				else
-					return done(null, false, { message: 'Incorrect password.' });
+					return done(null, false, { message: 'Incorrect password' });
             }
             else
-            	return done(null, false, { message: 'Incorrect username.' });
+            	return done(null, false, { message: 'Incorrect username' });
         }
        });
       }
