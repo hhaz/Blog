@@ -24,11 +24,7 @@ var nbPagesComments = 5;
 var nbPagesFiles = 5;
 var nbPagesPosts = 5;
 var nbPosts;
-var sessionTimeOut = 18000000; //300 minutes
-
-app.use(express.limit('400mb'));
-app.use(express.cookieParser());
-app.use(express.session({maxAge:sessionTimeOut,  store: new MemoryStore(), secret:'my secret'}));
+var sessionTimeOut = 3600000; //1 hour
 
 var server = connect();
 
@@ -38,6 +34,9 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+  app.use(express.limit('400mb'));
+  app.use(express.cookieParser());
+  app.use(express.session({cookie: { maxAge : sessionTimeOut },  store: new MemoryStore(), secret:'my secret'}));
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
@@ -88,11 +87,11 @@ passport.use(new LocalStrategy(
   }));
   
 passport.serializeUser(function(user, done) {
-  done(null, user.userName);
+  done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
-  blogAdmin.findUser( user, function(user) {
+  blogAdmin.findUser( user.userName, function(user) {
     done(null, user);
   });
 });
@@ -100,20 +99,10 @@ passport.deserializeUser(function(user, done) {
 // Security hook
 function loadUser (req, res, next) {
 	if (req.user) {
-	console.log("name : " + req.user.userName);
-    req.currentUser = req.session.user_id;
-    req.session.maxAge = Date.now() + sessionTimeOut;
     next();
   } else {
     res.redirect('/blog/login');
   }
-  /*if (req.session.user_id) {
-    req.currentUser = req.session.user_id;
-    req.session.maxAge = Date.now() + sessionTimeOut;
-    next();
-  } else {
-    res.redirect('/blog/login');
-  }*/
 }
 
 app.set('view options', { layout: true });
@@ -133,7 +122,7 @@ app.get('/', loadUser, function(req, res){
             nbPosts:nbPosts,
             nbPagesPosts:nbPagesPosts,
             pageId:1,
-            currentSession:req.session
+            currentSession:req.user
         });
     })
 });
@@ -175,27 +164,11 @@ app.get('/:pageId', loadUser ,function(req, res){
 
 app.get('/blog/login', function(req, res) {
     //blogAdmin.addUser( {userName:'hervea', password:'hervea', email:'herve.azoulay@free.fr', admin:true},function(error) { console.log("hgjgh"); console.log(error);});
-    req.session.user_id = null;
     res.render('login.jade', { 
         title: 'Login'
     });
 });
 
-/*app.post('/blog/login', function(req, res){
-    blogAdmin.login(req.param('username'), req.param('password'),function(result) {
-      if(result) {
-        req.session.user_id = result.userName;
-        req.session.cookie.maxAge = sessionTimeOut;
-        req.session.isAdmin = result.admin;
-        req.session.cookie.token = Math.floor((Math.random()*100)+1);
-        console.log( "User : " + result.userName + " has logged in"); 
-        articleProvider.logInformation(req.connection.remoteAddress, result.userName, function(error) {});
-        res.redirect('/');
-      }
-      else
-        res.redirect('/blog/login');
-    });
-});*/
 
 app.post('/blog/login',
   passport.authenticate('local', { successRedirect: '/',
@@ -217,7 +190,7 @@ app.post('/blog/new', loadUser ,function(req, res){
     articleProvider.save({
         title: req.param('title'),
         body: formattedBody,
-        user:req.session.user_id
+        user:req.user.userName
     }, function( error, docs) {
         nbPosts += 1;
         res.redirect('/')
@@ -234,13 +207,13 @@ app.post('/upload', loadUser ,function(req, res){
       if( Array.isArray(req.files.fileNames) ) {
         req.files.fileNames.forEach( function(elem) { 
         data = fs.readFileSync(elem.path);
-        articleProvider.uploadDocument(req.param('_id'), elem.name ,data,req.session.user_id, function() {
+        articleProvider.uploadDocument(req.param('_id'), elem.name ,data,req.user.userName, function() {
           });
         });
       }
       else {
         data = fs.readFileSync(req.files.fileNames.path);
-        articleProvider.uploadDocument(req.param('_id'), req.files.fileNames.name ,data,req.session.user_id, function() {
+        articleProvider.uploadDocument(req.param('_id'), req.files.fileNames.name ,data,req.user.userName, function() {
           });
       }
       res.redirect('/blog/' + req.param('_id') + '/1');
@@ -285,7 +258,7 @@ app.get('/blog/:id/:page', loadUser , function(req, res) {
             nbPagesComments:nbPagesComments,
             files:article.files,
             nbPagesFiles:nbPagesFiles,
-            currentUser:req.session.user_id,
+            currentUser:req.user.userName,
             currentSession:req.session
         });
     });
@@ -300,7 +273,7 @@ app.post('/blog/addComment', loadUser , function(req, res) {
     }); 
     var formattedComments = req.param('comment').replace(/\r\n/g, "<br/>");
     articleProvider.addCommentToArticle(req.param('_id'), {
-        person: req.session.user_id,
+        person: req.user.userName,
         comment: formattedComments,
         created_at: new Date()
        } , function( error, docs) {
@@ -330,20 +303,20 @@ app.post('/blog/deleteUser', loadUser , function(req,res) {
 });
 
 app.get('/blog/manageUser', loadUser , function(req, res) {
-  blogAdmin.getUsers( req.session.user_id , req.session.isAdmin, function (error,result) {
+  blogAdmin.getUsers( req.user.userNane, req.user.admin, function (error,result) {
     res.render('user.jade', { 
         title: 'Manage Users',
-        admin:req.session.isAdmin,
+        admin:req.user.admin,
         users:result
     });
   });
 });
 
 app.get('/blog/ViewLog', loadUser , function(req, res) {
-  blogAdmin.getLog( req.session.user_id , req.session.isAdmin, function (error,result) {
+  blogAdmin.getLog( req.user.userName, req.user.admin, function (error,result) {
     res.render('viewlog.jade', { 
         title: 'View Log',
-        admin:req.session.isAdmin,
+        admin:req.user.admin,
         logs:result
     });
   });
