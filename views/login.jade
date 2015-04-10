@@ -18,15 +18,21 @@ block content
    table(id="tableLogin")
     td
      h3= title
-   form(method="post")
     table(id="tableLogin")
-     td User Name
-     td 
-      div 
-       input(type="text", name="username", id="username")
+     form(method="post",action="/blog/login")
+      td User Name
+      td 
+       div 
+        input(type="text", name="username", id="username")
+      tr
+      td Password
+      td 
+       div
+        input(type="password", name="password", id="password")
+        input(type="submit", value="OK")
      tr
-     td Password
-     td 
+     td Google Sign-in
+     td
       div
-       input(type="password", name="password", id="password")
-       input(type="submit", value="OK")
+       form(method="post",action="/auth/google")
+        input(type="submit", value="Sign-in With Google")  

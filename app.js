@@ -1,4 +1,5 @@
 var express = require('express');
+var flash = require('connect-flash');
 var nib = require('nib');
 var connect = require('connect');
 var stylus = require('stylus');
@@ -11,6 +12,8 @@ var LocalStrategy = require('passport-local').Strategy;
 var ArticleProvider = require('./articleprovider-mongodb').ArticleProvider;
 var BlogAdmin = require('./blog-admin').BlogAdmin;
 var crypto = require('crypto');
+var GoogleStrategy = require('passport-google').Strategy;
+var currentStrategy;
 
 var options = {
   key: fs.readFileSync('./server.key'),
@@ -29,6 +32,7 @@ var sessionTimeOut = 3600000; //1 hour
 var server = connect();
 
 app.configure(function(){
+  app.use(flash());
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
@@ -59,9 +63,9 @@ var type = Function.prototype.call.bind( Object.prototype.toString );
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
+    currentStrategy = "local";
      blogAdmin.getCollection('users', function(error, user_collection) {
       if( error ) {
-      	console.log(error);
       	callback(error);
       }
       else {
@@ -86,14 +90,40 @@ passport.use(new LocalStrategy(
   });
   }));
   
+passport.use(new GoogleStrategy({
+    returnURL: 'https://localhost/auth/google/callback',
+    realm: 'https://localhost/'
+  },
+  function(identifier, profile, done) {
+    process.nextTick(function () {
+      currentStrategy = "Google";
+      profile.identifier = identifier;
+      return done(null, profile);
+    });
+  }
+));
+
 passport.serializeUser(function(user, done) {
+  if (currentStrategy == "Google")
+  {
+    user = user.emails[0].value;
+  }
   done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
-  blogAdmin.findUser( user.userName, function(user) {
+  if (currentStrategy == "Google")
+  {
+    blogAdmin.findUser( user, function(user) {
+    done(null, user);
+   });  
+  }
+  else
+  {
+    blogAdmin.findUser( user.userName, function(user) {
     done(null, user);
   });
+  }
 });
 
 // Security hook
@@ -127,6 +157,19 @@ app.get('/', loadUser, function(req, res){
     })
 });
 
+
+app.post('/auth/google',
+  passport.authenticate('google'),
+  function(req, res){
+    // The request will be redirected to Google for authentication, so
+    // this function will not be called.
+  });
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
 
 app.post('/delete', loadUser, function(req, res){
     articleProvider.delete( req.param('id') , function(error){
@@ -169,13 +212,16 @@ app.get('/blog/login', function(req, res) {
     });
 });
 
-
 app.post('/blog/login',
   passport.authenticate('local', { successRedirect: '/',
                                    failureRedirect: '/login',
                                    failureFlash: true })
-); 
+);
 
+app.get('/blog/logout', function(req, res){
+  req.logout();
+  res.redirect('/blog/login');
+});
 
 app.get('/blog/new', loadUser ,function(req, res) {
     res.render('blog_new.jade', { 
@@ -200,9 +246,6 @@ app.post('/blog/new', loadUser ,function(req, res){
 
 //Upload
 app.post('/upload', loadUser ,function(req, res){
-  console.log( "body :" + req.body);
-  console.log( "filenames : " + req.param('fileNames'));
-  console.log( "id : " + req.param('_id'));
     if(req.files.fileNames.name != '') {
       if( Array.isArray(req.files.fileNames) ) {
         req.files.fileNames.forEach( function(elem) { 
